@@ -1,31 +1,128 @@
+<!-- app/views/layouts/application.html.erb -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Monki App" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Monki App">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Dynamic Title Meta Tag -->
+    <title><%= content_for?(:title) ? yield(:title) : "<%= Rails.configuration.site_name %>" %></title>
+    
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
+    <!-- 1. BOOTSTRAP QUICK START CSS CDN -->
+    <link href="https://jsdelivr.net" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <!-- 2. HIGH-END EDITORIAL GOOGLE FONTS -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <!-- 3. MINIMALIST ART-GALLERY PERFORMANCE STYLES -->
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fcfcfc;
+        color: #111111;
+        letter-spacing: -0.01em;
+      }
+      .font-serif {
+        font-family: 'Playfair Display', serif;
+      }
+      .letter-spacing-wide {
+        letter-spacing: 0.15em;
+      }
+      .gallery-hover-container {
+        overflow: hidden;
+      }
+      .gallery-hover-container img {
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .gallery-hover-container:hover img {
+        transform: scale(1.04);
+      }
+      .backdrop-blur {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+    </style>
+    
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-
   <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <%= yield %>
+
+    <!-- 4. GLOBAL FLASH ALERTS (Bootstrap List Format) -->
+    <% if flash.any? %>
+      <div class="container-fluid px-md-5 mt-3 position-absolute top-0 start-50 translate-middle-x" style="z-index: 2000;">
+        <% flash.each do |type, message| %>
+          <div class="alert alert-<%= type == 'notice' ? 'success' : 'danger' %> alert-dismissible rounded-0 fade show small letter-spacing-wide text-uppercase" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- 5. GLOBAL HEADER NAVIGATION -->
+    <header class="border-bottom sticky-top bg-white bg-opacity-75 backdrop-blur py-3" style="z-index: 1020;">
+      <div class="container-fluid px-md-5">
+        <div class="row align-items-center">
+          
+          <!-- Navigation Menu (Left) -->
+          <nav class="col-4 d-none d-md-flex gap-4 text-uppercase small letter-spacing-wide">
+            <%= link_to "Exhibitions", root_path, class: "text-decoration-none text-dark fw-medium" %>
+            <a href="#" class="text-decoration-none text-muted">Wearables</a>
+            <a href="#" class="text-decoration-none text-muted">Objects</a>
+          </nav>
+          
+          
+          <div class="col-6 col-md-4 text-md-center">
+            <%= link_to "MONKI // Merch & Art", root_path, class: "font-serif text-decoration-none text-dark fs-2 fw-bold letter-spacing-wide" %>
+          </div>
+          
+          <!-- External Action Target Link (Right) -->
+          <div class="col-6 col-md-4 text-end d-flex justify-content-end align-items-center gap-3">
+            <div class="position-relative d-none d-sm-block me-2">
+              <input type="text" class="form-control form-control-sm rounded-0 border-dark bg-transparent" placeholder="Search curated works..." style="width: 200px; font-size: 0.8rem;">
+            </div>
+            
+            <!-- Replace with your partner's actual public Etsy shop link -->
+            <a href="https://etsy.com" target="_blank" class="text-dark text-decoration-none text-uppercase small letter-spacing-wide fw-medium">
+              Shop on Etsy <span class="fs-6">↗</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- 6. CORE VIEW INJECTION SITE -->
+    <main>
+      <%= yield %>
+    </main>
+
+    <!-- 7. GLOBAL FOOTER COMPONENT -->
+    <footer class="bg-dark text-white-50 py-5 mt-5 border-top border-secondary">
+      <div class="container-fluid px-md-5">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h4 class="font-serif text-white h5 mb-3"><%= Rails.configuration.site_name %></h4>
+            <p class="small text-muted col-lg-8">A collaborative visual platform intersecting artistic frames with modular, earth-conscious ready-to-wear drops.</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <h5 class="text-white text-uppercase small letter-spacing-wide mb-3">Join the Digital Registry</h5>
+            <div class="d-flex justify-content-md-end">
+              <input type="email" class="form-control form-control-sm rounded-0 border-secondary bg-transparent text-white me-2" placeholder="Email Address" style="width: 250px;">
+              <button class="btn btn-sm btn-light rounded-0 text-uppercase small letter-spacing-wide">Subscribe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 8. BOOTSTRAP QUICK START JS BUNDLE CDN (Required for Alert Dismiss Buttons) -->
+    <script src="https://jsdelivr.net" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>
